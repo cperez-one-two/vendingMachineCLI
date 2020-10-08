@@ -12,7 +12,20 @@ public class FeedMoneyOperation extends Operation {
 			return "How much are you depositing?";
 		}else{
 			try{
-				int deposited = Integer.parseInt(input);
+//				if(input.contains(".")){
+//					if(input.indexOf('.') < input.length() - 3){
+//						throw new Exception();
+//					}
+//					if(input.substring(input.indexOf('.') + 1).contains(".")){
+//						throw new Exception();
+//					}
+//					input = input.replace(".","");
+//				}
+//				if(input.startsWith("$")){
+//					input = input.substring(1);
+//				}
+				//FIXME
+				int deposited = Integer.parseInt(input) * 100;
 				vendor.addBalance(deposited);
 				return "";
 			}catch(Exception e){

@@ -8,9 +8,6 @@ public class FinishTransactionOperation extends Operation {
 
 	@Override
 	public String operation(String input) {
-		vendor.endPurchase();
-		return "";
+		return vendor.endPurchase();
 	}
-	
-	
 }

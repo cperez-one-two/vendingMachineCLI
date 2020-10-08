@@ -36,7 +36,7 @@ public class VendingMachine {
 	
 	public String getDisplay(){
 		if(inPurchase){
-			return purchaseMenu.getDisplayString() + "\nCurrent Money Provided: " + displayBalance();
+			return purchaseMenu.getDisplayString() + "\nCurrent Money Provided: " + formatMoney(balance);
 		}else{
 			return mainMenu.getDisplayString();
 		}
@@ -50,27 +50,71 @@ public class VendingMachine {
 	public void addBalance(int deposited) {
 		balance += deposited;
 	}
-	public int getBalance() {
-		return 0;
-	}
+	
 	public String getProductList() {
-		return "No products in stock!";
+		if(slots.isEmpty()){
+			return "No products in stock!";
+		}
+		
+		String output = "";
+		
+		for(String slot : slots.keySet()){
+			Product current = slots.get(slot);
+			int quantity = current.getStock();
+			int price = current.getPrice();
+			String name = current.getName();
+			
+			output += String.format("%s: %s (%s) ", slot, name, formatMoney(price));
+			if(quantity == 0){
+				output += "SOLD OUT\n";
+			}else{
+				output += String.format("%d\n", quantity);
+			}
+		}
+		
+		return output;
 	}
+	
+	//TODO
 	public String purchase(String input) {
 		return "No products in stock!";
 	}
 	
-	public String displayBalance(){
-		return String.format("$%d.%d", balance/100, balance%100);
+	//FIXME
+	public String formatMoney(int cents){
+		return String.format("$%d.%02d", cents/100, cents%100);
 	}
 	
+	//TODO
 	public void beginPurchase(){
 		inPurchase = true;
 	}
 	
-	public void endPurchase(){
+	//TODO
+	public String endPurchase(){
 		inPurchase = false;
+		if(balance == 0){
+			return "Thank you for your purchase!";
+		}
+		int quarters = balance/25;
+		balance -= quarters*25;
+		int dimes = balance/10;
+		balance -= dimes*10;
+		int nickels = balance/5;
+		
+		String change = "Here's your change:\n";
+		if(quarters > 0){
+			change += String.format("%d quarters\n", quarters);
+		}
+		if(dimes > 0){
+			change += String.format("%d dimes\n", dimes);
+		}
+		if(nickels > 0){
+			change += String.format("%d nickels\n", nickels);
+		}
+		
 		balance = 0;
+		return change + "Thank you for your purchase!\n";
 	}
 	
 	private void loadInventory(String filename) {
@@ -91,10 +135,11 @@ public class VendingMachine {
 					case "Gum":
 						slots.put(params[0], new Gum(params[1], parsedPrice, MAX_STOCK));
 						break;
-					case "Beverage":
+					case "Drink":
 						slots.put(params[0], new Beverage(params[1], parsedPrice, MAX_STOCK));
 						break;
 					default:
+						System.out.println(params[3]);
 						throw new Exception("Something wrong with input file.");
 				}
 

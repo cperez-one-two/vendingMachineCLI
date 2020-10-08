@@ -14,6 +14,7 @@ public class VendingMachineCLI {
 			String in = pollInput(vendor.getDisplay());
 			System.out.println(vendor.select(in));
 		}
+		input.close();
 	}
 	
 	public static String pollInput(String prompt){
