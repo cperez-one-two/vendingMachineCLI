@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class VendingMachine {
 	private Menu mainMenu;
@@ -14,6 +15,8 @@ public class VendingMachine {
 	private int maxStock;
 	private Map<String, Product> slots = new HashMap<String, Product>();
 	private Log log;
+	private int profit;
+	private boolean didPurchase;
 
 	public void exit() {
 		running = false;
@@ -28,12 +31,15 @@ public class VendingMachine {
 		mainMenu = new Menu(new Operation[]{
 				new DisplayOperation(this),
 				new PurchaseOperation(this),
-				new ExitOperation(this)});
+				new ExitOperation(this),
+				new SalesReportOperation(this)});
 		purchaseMenu = new Menu(new Operation[]{
 				new FeedMoneyOperation(this),
 				new SelectProductOperation(this),
 				new FinishTransactionOperation(this)});
 		balance = 0;
+		profit = 0;
+		didPurchase = false;
 		log = new Log(logFileName);
 		log.log("Starting up...");
 		loadInventory(inventoryFileName);
@@ -67,13 +73,17 @@ public class VendingMachine {
 		
 		String output = "";
 		
-		for(String slot : slots.keySet()){
-			Product current = slots.get(slot);
+		String[] slotList = slots.keySet().toArray(new String[0]);
+		
+		Arrays.sort(slotList);
+		
+		for(int i = 0; i < slotList.length; i++){
+			Product current = slots.get(slotList[i]);
 			int quantity = current.getStock();
 			int price = current.getPrice();
 			String name = current.getName();
 			
-			output += String.format("%s: %s (%s) ", slot, name, formatMoney(price));
+			output += String.format("%s: %s (%s) ", slotList[i], name, formatMoney(price));
 			if(quantity == 0){
 				output += "SOLD OUT\n";
 			} else {
@@ -98,6 +108,8 @@ public class VendingMachine {
 		}
 		String logMessage = String.format("%s %s %s ", purchased.getName(), selection, formatMoney(balance));
 		balance -= purchased.getPrice();
+		didPurchase = true;
+		profit += purchased.getPrice();
 		logMessage += formatMoney(balance);
 		purchased.setStock( purchased.getStock() - 1);
 		log.log(logMessage);
@@ -114,8 +126,13 @@ public class VendingMachine {
 	
 	public String endPurchase(){
 		inPurchase = false;
+		String goodbye = "\n";
+		if(didPurchase){
+			goodbye = "Thank you for your purchase!\n";
+			didPurchase = false;
+		}
 		if(balance == 0){
-			return "Thank you for your purchase!";
+			return goodbye;
 		}
 		
 		log.log(String.format("GIVE CHANGE: %s $0.00", formatMoney(balance)));
@@ -138,7 +155,7 @@ public class VendingMachine {
 		}
 		
 		balance = 0;
-		return change + "Thank you for your purchase!\n";
+		return change + goodbye;
 	}
 	
 	private void loadInventory(String filename) {
@@ -175,6 +192,18 @@ public class VendingMachine {
 		}
 	}
 	public void generateSalesReport() {
+		String[] names = new String[slots.size()];
+		int[] sold = new int[slots.size()];
+		String[] slotList = slots.keySet().toArray(new String[0]);
+	
+		Arrays.sort(slotList);
 		
+		for(int i = 0; i < slotList.length; i++){
+			names[i] = slots.get(slotList[i]).getName();
+			sold[i] = maxStock - slots.get(slotList[i]).getStock();
+		}
+		
+		SalesReport report = new SalesReport(names, sold, formatMoney(profit));
+		log.log(report.generateSalesReport());
 	}
 }

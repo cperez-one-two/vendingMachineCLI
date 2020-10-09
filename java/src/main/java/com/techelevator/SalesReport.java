@@ -10,7 +10,8 @@ public class SalesReport {
 	private File salesReportFile;
 	private String productReport;
 
-	public SalesReport(String[] products, int[] numberSold, int totalProfit) {
+	public SalesReport(String[] products, int[] numberSold, String totalProfit) {
+		productReport = "";
 		for (int i = 0; i<products.length; i++ ) {
 			productReport += products[i] + "|" + numberSold[i] + "\n";
 		}
@@ -19,7 +20,7 @@ public class SalesReport {
 	
 	public String generateSalesReport() {
 		DateTimeFormatter timeFormatter =
-				DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
+				DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
 		String completeFilename = 
 				"SalesReport-" + LocalDateTime.now().format(timeFormatter) + ".txt";
 		try {
@@ -31,8 +32,7 @@ public class SalesReport {
 		try (PrintWriter writer = new PrintWriter(salesReportFile)){
 			writer.println(productReport);
 		} catch (Exception e) {
-			System.out.println("Couldn't create the Sales report.");
-			System.exit(1);
+			return "Error generating sales report";
 		}
 		
 		return "Sales report saved to " + completeFilename;

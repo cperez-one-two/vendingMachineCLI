@@ -8,7 +8,9 @@ public class Menu {
 	public String getDisplayString(){
 		String display = "";
 		for(int i = 0; i < operations.length; i++){
-			display += String.format("(%d) %s\n", i + 1, operations[i].getName());
+			if(!operations[i].getName().startsWith("_")){
+				display += String.format("(%d) %s\n", i + 1, operations[i].getName());
+			}
 		}
 		return display;
 	}
