@@ -1,5 +1,6 @@
 package com.techelevator;
 
+
 public class FeedMoneyOperation extends Operation {
 
 	public FeedMoneyOperation(VendingMachine vendor) {
@@ -9,24 +10,18 @@ public class FeedMoneyOperation extends Operation {
 	@Override
 	public String operation(String input) {
 		if(input.length() == 0){
-			return "How much are you depositing?";
+			return "Please insert bill (1s, 2s, 5s, and 10s accepted)";
 		}else{
 			try{
-//				if(input.contains(".")){
-//					if(input.indexOf('.') < input.length() - 3){
-//						throw new Exception();
-//					}
-//					if(input.substring(input.indexOf('.') + 1).contains(".")){
-//						throw new Exception();
-//					}
-//					input = input.replace(".","");
-//				}
-//				if(input.startsWith("$")){
-//					input = input.substring(1);
-//				}
-				//FIXME
-				int deposited = Integer.parseInt(input) * 100;
-				vendor.addBalance(deposited);
+				if(input.startsWith("$")){
+					input = input.substring(1);
+				}
+				int deposited = Integer.parseInt(input);
+				if (deposited != 1 && deposited != 2 &&
+						deposited != 5 && deposited != 10) {
+					return "Sorry, largest bill accepted is $10";
+				}
+				vendor.addBalance(deposited * 100);
 				return "";
 			}catch(Exception e){
 				return "Please enter an amount of money.";

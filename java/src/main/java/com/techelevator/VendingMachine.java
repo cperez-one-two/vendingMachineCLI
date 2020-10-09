@@ -14,6 +14,8 @@ public class VendingMachine {
 	private Map<String, Product> slots = new HashMap<String, Product>();
 	private static final int MAX_STOCK = 5;
 	private static final String INVENTORY_FILENAME = "vendingmachine.csv";
+	private static final String LOG_FILENAME = "log.log.txt";
+	private Log log = new Log(LOG_FILENAME);
 
 	public void exit() {running = false;}
 	public boolean isRunning(){return running;}
@@ -31,6 +33,7 @@ public class VendingMachine {
 				new FinishTransactionOperation(this)});
 		balance = 0;
 		loadInventory(INVENTORY_FILENAME);
+		log.log("log log test! log.");
 	}
 	
 	
@@ -67,7 +70,7 @@ public class VendingMachine {
 			output += String.format("%s: %s (%s) ", slot, name, formatMoney(price));
 			if(quantity == 0){
 				output += "SOLD OUT\n";
-			}else{
+			} else {
 				output += String.format("%d\n", quantity);
 			}
 		}
@@ -75,12 +78,22 @@ public class VendingMachine {
 		return output;
 	}
 	
-	//TODO
 	public String purchase(String input) {
-		return "No products in stock!";
+		String selection = input.toUpperCase();
+		if (!slots.containsKey(selection)) {
+			return "Invalid selection. Please choose a valid slot.";
+		}
+		if (slots.get(selection).getStock() < 1) {
+			return "No products in stock!";
+		}
+		if( balance < slots.get(selection).getPrice() ) {
+			return "Insufficient funds. Please insert more money.";
+		}
+		balance -= slots.get(selection).getPrice();
+		slots.get(selection).setStock( slots.get(selection).getStock() - 1);
+		return slots.get(selection).getSelectionNoise();
 	}
 	
-	//FIXME
 	public String formatMoney(int cents){
 		return String.format("$%d.%02d", cents/100, cents%100);
 	}
