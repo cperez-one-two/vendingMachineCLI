@@ -174,4 +174,7 @@ public class VendingMachine {
 			System.exit(1);
 		}
 	}
+	public void generateSalesReport() {
+		
+	}
 }
