@@ -11,18 +11,20 @@ public class VendingMachine {
 	private boolean inPurchase;
 	private boolean running;
 	private int balance;
+	private int maxStock;
 	private Map<String, Product> slots = new HashMap<String, Product>();
-	private static final int MAX_STOCK = 5;
-	private static final String INVENTORY_FILENAME = "vendingmachine.csv";
-	private static final String LOG_FILENAME = "log.log.txt";
-	private Log log = new Log(LOG_FILENAME);
+	private Log log;
 
-	public void exit() {running = false;}
+	public void exit() {
+		running = false;
+		log.log("Shutting down...");
+	}
 	public boolean isRunning(){return running;}
 	
-	public VendingMachine(){
+	public VendingMachine(String inventoryFileName, String logFileName, int maxStock){
 		running = true;
 		inPurchase = false;
+		this.maxStock = maxStock;
 		mainMenu = new Menu(new Operation[]{
 				new DisplayOperation(this),
 				new PurchaseOperation(this),
@@ -32,8 +34,9 @@ public class VendingMachine {
 				new SelectProductOperation(this),
 				new FinishTransactionOperation(this)});
 		balance = 0;
-		loadInventory(INVENTORY_FILENAME);
-		log.log("log log test! log.");
+		log = new Log(logFileName);
+		log.log("Starting up...");
+		loadInventory(inventoryFileName);
 	}
 	
 	
@@ -51,7 +54,10 @@ public class VendingMachine {
 	}
 	
 	public void addBalance(int deposited) {
+		String logMessage = "FEED MONEY: " + formatMoney(balance);
 		balance += deposited;
+		logMessage += " " + formatMoney(balance);
+		log.log(logMessage);
 	}
 	
 	public String getProductList() {
@@ -83,32 +89,37 @@ public class VendingMachine {
 		if (!slots.containsKey(selection)) {
 			return "Invalid selection. Please choose a valid slot.";
 		}
-		if (slots.get(selection).getStock() < 1) {
+		Product purchased = slots.get(selection);
+		if (purchased.getStock() < 1) {
 			return "No products in stock!";
 		}
-		if( balance < slots.get(selection).getPrice() ) {
+		if( balance < purchased.getPrice() ) {
 			return "Insufficient funds. Please insert more money.";
 		}
-		balance -= slots.get(selection).getPrice();
-		slots.get(selection).setStock( slots.get(selection).getStock() - 1);
-		return slots.get(selection).getSelectionNoise();
+		String logMessage = String.format("%s %s %s ", purchased.getName(), selection, formatMoney(balance));
+		balance -= purchased.getPrice();
+		logMessage += formatMoney(balance);
+		purchased.setStock( purchased.getStock() - 1);
+		log.log(logMessage);
+		return purchased.getSelectionNoise();
 	}
 	
 	public String formatMoney(int cents){
 		return String.format("$%d.%02d", cents/100, cents%100);
 	}
 	
-	//TODO
 	public void beginPurchase(){
 		inPurchase = true;
 	}
 	
-	//TODO
 	public String endPurchase(){
 		inPurchase = false;
 		if(balance == 0){
 			return "Thank you for your purchase!";
 		}
+		
+		log.log(String.format("GIVE CHANGE: %s $0.00", formatMoney(balance)));
+		
 		int quarters = balance/25;
 		balance -= quarters*25;
 		int dimes = balance/10;
@@ -140,16 +151,16 @@ public class VendingMachine {
 				int parsedPrice = Integer.parseInt(params[2].replace(".", ""));
 				switch(params[3]) {
 					case "Chip":
-						slots.put(params[0], new Chips(params[1], parsedPrice, MAX_STOCK));
+						slots.put(params[0], new Chips(params[1], parsedPrice, maxStock));
 						break;
 					case "Candy":
-						slots.put(params[0], new Candy(params[1], parsedPrice, MAX_STOCK));
+						slots.put(params[0], new Candy(params[1], parsedPrice, maxStock));
 						break;
 					case "Gum":
-						slots.put(params[0], new Gum(params[1], parsedPrice, MAX_STOCK));
+						slots.put(params[0], new Gum(params[1], parsedPrice, maxStock));
 						break;
 					case "Drink":
-						slots.put(params[0], new Beverage(params[1], parsedPrice, MAX_STOCK));
+						slots.put(params[0], new Beverage(params[1], parsedPrice, maxStock));
 						break;
 					default:
 						System.out.println(params[3]);
@@ -158,6 +169,7 @@ public class VendingMachine {
 
 			}
 		} catch (Exception e) {
+			log.log("Error loading inventory. Shutting down...");
 			System.out.println("Error loading inventory.");
 			System.exit(1);
 		}

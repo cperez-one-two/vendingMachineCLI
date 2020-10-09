@@ -9,7 +9,7 @@ public class SelectProductOperation extends Operation {
 	@Override
 	public String operation(String input) {
 		if(input == ""){
-			return "Plese enter the slot of the product you would like to purchase.";
+			return "Please enter the slot of the product you would like to purchase.";
 		}else{
 			return vendor.purchase(input);
 		}

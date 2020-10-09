@@ -19,7 +19,7 @@ public class FeedMoneyOperation extends Operation {
 				int deposited = Integer.parseInt(input);
 				if (deposited != 1 && deposited != 2 &&
 						deposited != 5 && deposited != 10) {
-					return "Sorry, largest bill accepted is $10";
+					return "Sorry, that bill is not accepted.";
 				}
 				vendor.addBalance(deposited * 100);
 				return "";
