@@ -17,6 +17,8 @@ public class VendingMachine {
 	private Log log;
 	private int profit;
 	private boolean didPurchase;
+	
+	private static final int displayVersion = 2;
 
 	public void exit() {
 		running = false;
@@ -66,7 +68,24 @@ public class VendingMachine {
 		log.log(logMessage);
 	}
 	
-	public String getProductList() {
+	@SuppressWarnings("unused")
+	public String getProductList(){
+		String output = "";
+		
+		if(displayVersion == 0){
+			return output + getProductList1();
+		}
+		if(displayVersion == 1){
+			return output + getProductList2();
+		}
+		if(displayVersion == 2){
+			return output + getProductList3();
+		}
+		return output + getProductList1();
+	}
+	
+	//aligned
+	public String getProductList1(){
 		if(slots.isEmpty()){
 			return "No products in stock!";
 		}
@@ -77,17 +96,217 @@ public class VendingMachine {
 		
 		Arrays.sort(slotList);
 		
+		String[] names = new String[slotList.length];
+		String[] quantities = new String[slotList.length];
+		String[] prices = new String[slotList.length];
+		
+		int slotSize = 0;
+		int nameSize = 0;
+		int quantitySize = 0;
+		int priceSize = 0;
+		
 		for(int i = 0; i < slotList.length; i++){
 			Product current = slots.get(slotList[i]);
-			int quantity = current.getStock();
-			int price = current.getPrice();
-			String name = current.getName();
 			
-			output += String.format("%s: %s (%s) ", slotList[i], name, formatMoney(price));
-			if(quantity == 0){
-				output += "SOLD OUT\n";
+			names[i] = current.getName();
+			prices[i] = formatMoney(current.getPrice());
+			if(current.getStock() == 0){
+				quantities[i] = "SOLD OUT";
 			} else {
-				output += String.format("%d\n", quantity);
+				quantities[i] = Integer.toString(current.getStock());
+			}
+			
+			if(slotList[i].length() > slotSize){
+				slotSize = slotList[i].length();
+			}
+			if(names[i].length() > nameSize){
+				nameSize = names[i].length();
+			}
+			if(prices[i].length() > priceSize){
+				priceSize = prices[i].length();
+			}
+			if(quantities[i].length() > quantitySize){
+				quantitySize = quantities[i].length();
+			}
+		}
+		for(int i = 0; i < slotList.length; i++){
+			while(slotList[i].length() < slotSize){
+				slotList[i] = " " + slotList[i];
+			}
+			while(quantities[i].length() < quantitySize){
+				quantities[i] = " " + quantities[i];
+			}
+			while(names[i].length() < nameSize){
+				names[i] = " " + names[i];
+			}
+			while(prices[i].length() < priceSize){
+				prices[i] = " " + prices[i];
+			}
+		}
+		for(int i = 0; i < slotList.length; i++){
+			output += String.format("%s: %s (%s) %s | ", slotList[i], names[i], prices[i], quantities[i]);
+			if(i%4 == 3){
+				output += "\n";
+			}
+		}
+		return output;
+	}
+		
+	//grid
+	public String getProductList2(){
+		if(slots.isEmpty()){
+			return "No products in stock!";
+		}
+		
+		String output = "";
+		
+		String[] slotList = slots.keySet().toArray(new String[0]);
+		
+		Arrays.sort(slotList);
+		
+		String[] names = new String[slotList.length];
+		String[] quantities = new String[slotList.length];
+		String[] prices = new String[slotList.length];
+		
+		int columns = 4;
+		
+		int[] slotSize = new int[columns];
+		int[] nameSize = new int[columns];
+		int[] quantitySize = new int[columns];
+		int[] priceSize = new int[columns];
+		
+		for(int i = 0; i < slotList.length; i++){
+			Product current = slots.get(slotList[i]);
+			
+			names[i] = current.getName();
+			prices[i] = formatMoney(current.getPrice());
+			if(current.getStock() == 0){
+				quantities[i] = "SOLD OUT";
+			} else {
+				quantities[i] = Integer.toString(current.getStock());
+			}
+			
+			if(slotList[i].length() > slotSize[i%4]){
+				slotSize[i%4] = slotList[i].length();
+			}
+			if(names[i].length() > nameSize[i%4]){
+				nameSize[i%4] = names[i].length();
+			}
+			if(prices[i].length() > priceSize[i%4]){
+				priceSize[i%4] = prices[i].length();
+			}
+			if(quantities[i].length() > quantitySize[i%4]){
+				quantitySize[i%4] = quantities[i].length();
+			}
+		}
+		
+		for(int i = 0; i < slotList.length; i++){
+			while(slotList[i].length() < slotSize[i%4]){
+				slotList[i] = " " + slotList[i];
+			}
+			while(quantities[i].length() < quantitySize[i%4]){
+				quantities[i] = " " + quantities[i];
+			}
+			while(names[i].length() < nameSize[i%4]){
+				names[i] = " " + names[i];
+			}
+			while(prices[i].length() < priceSize[i%4]){
+				prices[i] = " " + prices[i];
+			}
+		}
+		
+		for(int i = 0; i < slotList.length; i++){
+			output += String.format("%s: %s (%s) %s | ", slotList[i], names[i], prices[i], quantities[i]);
+			if(i%4 == 3){
+				output += "\n";
+			}
+		}
+		
+		return output;
+	}
+	
+	//short grid
+	public String getProductList3(){
+		if(slots.isEmpty()){
+			return "No products in stock!";
+		}
+		
+		String output = "    ";
+		
+		String[] slotList = slots.keySet().toArray(new String[0]);
+		
+		Arrays.sort(slotList);
+		
+		String[] names = new String[slotList.length];
+		String[] quantities = new String[slotList.length];
+		String[] prices = new String[slotList.length];
+		
+		int columns = 4;
+		
+		int[] nameSize = new int[columns];
+		int[] quantitySize = new int[columns];
+		int[] priceSize = new int[columns];
+		
+		for(int i = 0; i < slotList.length; i++){
+			Product current = slots.get(slotList[i]);
+			
+			names[i] = current.getName();
+			prices[i] = formatMoney(current.getPrice());
+			if(current.getStock() == 0){
+				quantities[i] = "SOLD OUT";
+			} else {
+				quantities[i] = Integer.toString(current.getStock());
+			}
+			
+			if(names[i].length() > nameSize[i%4]){
+				nameSize[i%4] = names[i].length();
+			}
+			if(prices[i].length() > priceSize[i%4]){
+				priceSize[i%4] = prices[i].length();
+			}
+			if(quantities[i].length() > quantitySize[i%4]){
+				quantitySize[i%4] = quantities[i].length();
+			}
+		}
+		
+		for(int i = 0; i < slotList.length; i++){
+			while(quantities[i].length() < quantitySize[i%4]){
+				quantities[i] = " " + quantities[i];
+			}
+			while(names[i].length() < nameSize[i%4]){
+				names[i] = " " + names[i];
+			}
+			while(prices[i].length() < priceSize[i%4]){
+				prices[i] = " " + prices[i];
+			}
+		}
+		
+		int totalSize = 0;
+		
+		for(int j = 0; j < columns; j++){
+			String header = "";
+			int columnSize = 7 + priceSize[j] + nameSize[j] + quantitySize[j];
+			totalSize += columnSize;
+			while(header.length() < columnSize/2 - 1 + columnSize%2){
+				header += " ";
+			}
+			header += slotList[j].substring(1) + header;
+			if(columnSize%2 == 0){header += " ";}
+			output += header;
+		}
+		output += "\n   ";
+		
+		for(int i = 0; i < 1 + totalSize; i++){
+			output += "-";
+		}
+		output += "\n";
+		for(int i = 0; i < slotList.length; i++){
+			if(i%4 == 0){
+				output += slotList[i].substring(0,1) + ": |";
+			}
+			output += String.format(" %s  %s  %s |", names[i], prices[i], quantities[i]);
+			if(i%4 == 3){
+				output += "\n";
 			}
 		}
 		
