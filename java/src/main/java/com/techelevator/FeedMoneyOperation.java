@@ -19,12 +19,12 @@ public class FeedMoneyOperation extends Operation {
 				int deposited = Integer.parseInt(input);
 				if (deposited != 1 && deposited != 2 &&
 						deposited != 5 && deposited != 10) {
-					return "Sorry, that bill is not accepted.";
+					return "Sorry, that bill is not accepted.\n";
 				}
 				vendor.addBalance(deposited * 100);
 				return "";
 			}catch(Exception e){
-				return "Please enter an amount of money.";
+				return "Please enter an amount of money.\n";
 			}
 		}
 	}

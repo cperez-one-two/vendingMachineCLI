@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class VendingMachineCLI {
 	
 	private static Scanner input = new Scanner(System.in);
-	private static final int MAX_STOCK = 1;
+	private static final int MAX_STOCK = 5;
 	private static final String INVENTORY_FILENAME = "vendingmachine.csv";
 	//FIXME
 	private static final String LOG_FILENAME = "log.log.txt";
@@ -23,6 +23,7 @@ public class VendingMachineCLI {
 	
 	public static String pollInput(String prompt){
 		System.out.println(prompt);
+		System.out.print(">> ");
 		return input.nextLine();
 	}
 }

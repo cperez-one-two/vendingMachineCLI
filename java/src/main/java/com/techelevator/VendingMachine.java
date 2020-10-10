@@ -18,7 +18,7 @@ public class VendingMachine {
 	private int profit;
 	private boolean didPurchase;
 	
-	private static final int displayVersion = 2;
+	private static final int displayVersion = 0;
 
 	public void exit() {
 		running = false;
@@ -70,8 +70,14 @@ public class VendingMachine {
 	
 	@SuppressWarnings("unused")
 	public String getProductList(){
-		String output = "";
-		
+		String output = 
+				"    ___          ___                    _        ___      _            _           __                               \r\n" + 
+				"   /   \\_ __    / __\\_ __ ___  ___ _ __( )__    / _ \\_ __(_)_   ____ _| |_ ___    /__\\ ___  ___  ___ _ ____   _____ \r\n" + 
+				"  / /\\ / '__|  /__\\// '__/ _ \\/ _ \\ '_ \\/ __|  / /_)/ '__| \\ \\ / / _` | __/ _ \\  / \\/// _ \\/ __|/ _ \\ '__\\ \\ / / _ \\\r\n" + 
+				" / /_//| |_   / \\/  \\ | |  __/  __/ | | \\__ \\ / ___/| |  | |\\ V / (_| | ||  __/ / _  \\  __/\\__ \\  __/ |   \\ V /  __/\r\n" + 
+				"/___,' |_(_)  \\_____/_|  \\___|\\___|_| |_|___/ \\/    |_|  |_| \\_/ \\__,_|\\__\\___| \\/ \\_/\\___||___/\\___|_|    \\_/ \\___|\r\n" + 
+				"                                                                                                                    \r\n" + 
+				"";
 		if(displayVersion == 0){
 			return output + getProductList1();
 		}
@@ -144,10 +150,7 @@ public class VendingMachine {
 			}
 		}
 		for(int i = 0; i < slotList.length; i++){
-			output += String.format("%s: %s (%s) %s | ", slotList[i], names[i], prices[i], quantities[i]);
-			if(i%4 == 3){
-				output += "\n";
-			}
+			output += String.format("%s: %s (%s) %s\n", slotList[i], names[i], prices[i], quantities[i]);
 		}
 		return output;
 	}
@@ -230,6 +233,7 @@ public class VendingMachine {
 		if(slots.isEmpty()){
 			return "No products in stock!";
 		}
+
 		
 		String output = "    ";
 		
@@ -316,14 +320,17 @@ public class VendingMachine {
 	public String purchase(String input) {
 		String selection = input.toUpperCase();
 		if (!slots.containsKey(selection)) {
-			return "Invalid selection. Please choose a valid slot.";
+			if (displayVersion == 2) {
+				return "Invalid selection. Enter row first, then column.\n";
+			}
+			return "Invalid selection. Please choose a valid slot.\n";
 		}
 		Product purchased = slots.get(selection);
 		if (purchased.getStock() < 1) {
 			return "No products in stock!";
 		}
 		if( balance < purchased.getPrice() ) {
-			return "Insufficient funds. Please insert more money.";
+			return "Insufficient funds. Please insert more money.\n";
 		}
 		String logMessage = String.format("%s %s %s ", purchased.getName(), selection, formatMoney(balance));
 		balance -= purchased.getPrice();
@@ -332,7 +339,7 @@ public class VendingMachine {
 		logMessage += formatMoney(balance);
 		purchased.setStock( purchased.getStock() - 1);
 		log.log(logMessage);
-		return purchased.getSelectionNoise();
+		return purchased.getSelectionNoise() + "\n";
 	}
 	
 	public String formatMoney(int cents){
