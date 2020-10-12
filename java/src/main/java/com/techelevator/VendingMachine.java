@@ -18,8 +18,16 @@ public class VendingMachine {
 	private int profit;
 	private boolean didPurchase;
 	
-	private static final int displayVersion = 0;
-
+	private static final int DISPLAY_VERSION = 0;
+	private static final String DISPLAY_HEADER = 
+			"    ___          ___                    _        ___      _            _           __                               \r\n" + 
+			"   /   \\_ __    / __\\_ __ ___  ___ _ __( )__    / _ \\_ __(_)_   ____ _| |_ ___    /__\\ ___  ___  ___ _ ____   _____ \r\n" + 
+			"  / /\\ / '__|  /__\\// '__/ _ \\/ _ \\ '_ \\/ __|  / /_)/ '__| \\ \\ / / _` | __/ _ \\  / \\/// _ \\/ __|/ _ \\ '__\\ \\ / / _ \\\r\n" + 
+			" / /_//| |_   / \\/  \\ | |  __/  __/ | | \\__ \\ / ___/| |  | |\\ V / (_| | ||  __/ / _  \\  __/\\__ \\  __/ |   \\ V /  __/\r\n" + 
+			"/___,' |_(_)  \\_____/_|  \\___|\\___|_| |_|___/ \\/    |_|  |_| \\_/ \\__,_|\\__\\___| \\/ \\_/\\___||___/\\___|_|    \\_/ \\___|\r\n";
+	
+	public String getDisplayHeader(){return DISPLAY_HEADER;}
+	
 	public void exit() {
 		running = false;
 		log.log("Shutting down...");
@@ -70,21 +78,15 @@ public class VendingMachine {
 	
 	@SuppressWarnings("unused")
 	public String getProductList(){
-		String output = 
-				"    ___          ___                    _        ___      _            _           __                               \r\n" + 
-				"   /   \\_ __    / __\\_ __ ___  ___ _ __( )__    / _ \\_ __(_)_   ____ _| |_ ___    /__\\ ___  ___  ___ _ ____   _____ \r\n" + 
-				"  / /\\ / '__|  /__\\// '__/ _ \\/ _ \\ '_ \\/ __|  / /_)/ '__| \\ \\ / / _` | __/ _ \\  / \\/// _ \\/ __|/ _ \\ '__\\ \\ / / _ \\\r\n" + 
-				" / /_//| |_   / \\/  \\ | |  __/  __/ | | \\__ \\ / ___/| |  | |\\ V / (_| | ||  __/ / _  \\  __/\\__ \\  __/ |   \\ V /  __/\r\n" + 
-				"/___,' |_(_)  \\_____/_|  \\___|\\___|_| |_|___/ \\/    |_|  |_| \\_/ \\__,_|\\__\\___| \\/ \\_/\\___||___/\\___|_|    \\_/ \\___|\r\n" + 
-				"                                                                                                                    \r\n" + 
-				"";
-		if(displayVersion == 0){
+		String output = DISPLAY_HEADER + "\n";
+		
+		if(DISPLAY_VERSION == 0){
 			return output + getProductList1();
 		}
-		if(displayVersion == 1){
+		if(DISPLAY_VERSION == 1){
 			return output + getProductList2();
 		}
-		if(displayVersion == 2){
+		if(DISPLAY_VERSION == 2){
 			return output + getProductList3();
 		}
 		return output + getProductList1();
@@ -320,7 +322,7 @@ public class VendingMachine {
 	public String purchase(String input) {
 		String selection = input.toUpperCase();
 		if (!slots.containsKey(selection)) {
-			if (displayVersion == 2) {
+			if (DISPLAY_VERSION == 2) {
 				return "Invalid selection. Enter row first, then column.\n";
 			}
 			return "Invalid selection. Please choose a valid slot.\n";

@@ -13,8 +13,8 @@ public class FeedMoneyOperationTest {
 		Assert.assertEquals("Please insert bill (1s, 2s, 5s, and 10s accepted)", operation.operation(""));
 		Assert.assertEquals("", operation.operation("2"));
 		Assert.assertEquals("", operation.operation("$1"));
-		Assert.assertEquals("Please enter an amount of money.", operation.operation("q"));
-		Assert.assertEquals("Sorry, that bill is not accepted.", operation.operation("3"));
+		Assert.assertEquals("Please enter an amount of money.\n", operation.operation("q"));
+		Assert.assertEquals("Sorry, that bill is not accepted.\n", operation.operation("3"));
 	}
 
 }
